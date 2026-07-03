@@ -1,5 +1,7 @@
 package com.example.presentation.screens
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.BorderStroke
@@ -12,6 +14,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.PersonOutline
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -76,20 +80,31 @@ fun ProfileScreen(viewModel: HealthViewModel) {
                 .padding(bottom = 32.dp)
         ) {
             // Header
-            Column {
-                Text(
-                    text = "YOUR METABOLIC ID",
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = SoftMutedGray,
-                    letterSpacing = 1.sp
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                FloatingEmblem(
+                    imageVector = Icons.Default.PersonOutline,
+                    color = SkyBlue,
+                    backgroundColor = SkyBlueLight
                 )
-                Text(
-                    text = "Profile Settings",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = DarkCharcoal
-                )
+                Column {
+                    Text(
+                        text = "YOUR METABOLIC ID",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = SoftMutedGray,
+                        letterSpacing = 1.sp
+                    )
+                    Text(
+                        text = "Profile Settings",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = DarkCharcoal
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -453,5 +468,45 @@ fun ProfileScreen(viewModel: HealthViewModel) {
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun FloatingEmblem(
+    imageVector: androidx.compose.ui.graphics.vector.ImageVector,
+    color: Color,
+    backgroundColor: Color,
+    modifier: Modifier = Modifier
+) {
+    val infiniteTransition = rememberInfiniteTransition(label = "floating_emblem")
+    val translationY by infiniteTransition.animateFloat(
+        initialValue = -3f,
+        targetValue = 3f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2000, easing = EaseInOutQuad),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "translation_y"
+    )
+
+    Box(
+        modifier = modifier
+            .graphicsLayer { this.translationY = translationY.dp.toPx() }
+            .size(44.dp)
+            .shadow(
+                elevation = 6.dp,
+                shape = RoundedCornerShape(14.dp),
+                ambientColor = color.copy(alpha = 0.2f),
+                spotColor = color.copy(alpha = 0.4f)
+            )
+            .background(backgroundColor, RoundedCornerShape(14.dp)),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = imageVector,
+            contentDescription = null,
+            tint = color,
+            modifier = Modifier.size(22.dp)
+        )
     }
 }

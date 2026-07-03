@@ -1,5 +1,6 @@
 package com.example.presentation.screens
 
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
@@ -27,7 +28,11 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -37,6 +42,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.domain.HealthCalculations
 import com.example.presentation.HealthViewModel
 import com.example.ui.theme.*
+import com.example.R
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.sin
@@ -172,13 +178,24 @@ fun BmiVisualizerCard(calc: HealthCalculations) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "BODY MASS INDEX (BMI)",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = SoftMutedGray,
-                    letterSpacing = 0.5.sp
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Animated3DIconBox(
+                        imageRes = R.drawable.wellness_leaf_3d_1783069447283,
+                        contentDescription = "Wellness Balance Icon",
+                        backgroundColor = MintGreenLight,
+                        sizeDp = 40
+                    )
+                    Text(
+                        text = "BODY MASS INDEX (BMI)",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = SoftMutedGray,
+                        letterSpacing = 0.5.sp
+                    )
+                }
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(8.dp))
@@ -373,14 +390,19 @@ fun BmrBreakdownCard(calc: HealthCalculations) {
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Icon(Icons.Default.Bolt, contentDescription = "BMR", tint = SoftCoral, modifier = Modifier.size(16.dp))
-                        Text("BMR Baseline", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = SoftMutedGray)
+                        Animated3DIconBox(
+                            imageRes = R.drawable.flame_calorie_3d_1783069434527,
+                            contentDescription = "BMR Flame Icon",
+                            backgroundColor = SoftCoralLight,
+                            sizeDp = 32
+                        )
+                        Text("BMR Baseline", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = SoftMutedGray)
                     }
                     Text(
                         text = "${calc.bmr} kcal",
-                        fontSize = 20.sp,
+                        fontSize = 18.sp,
                         fontWeight = FontWeight.ExtraBold,
                         color = DarkCharcoal,
                         modifier = Modifier.padding(top = 8.dp)
@@ -397,14 +419,20 @@ fun BmrBreakdownCard(calc: HealthCalculations) {
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Icon(Icons.Default.DirectionsRun, contentDescription = "TDEE", tint = MintGreen, modifier = Modifier.size(16.dp))
-                        Text("Active TDEE", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = SoftMutedGray)
+                        Animated3DIconBox(
+                            imageVector = Icons.Default.DirectionsRun,
+                            contentDescription = "TDEE Icon",
+                            backgroundColor = MintGreen,
+                            iconColor = Color.White,
+                            sizeDp = 32
+                        )
+                        Text("Active TDEE", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = SoftMutedGray)
                     }
                     Text(
                         text = "${calc.tdee} kcal",
-                        fontSize = 20.sp,
+                        fontSize = 18.sp,
                         fontWeight = FontWeight.ExtraBold,
                         color = DarkCharcoal,
                         modifier = Modifier.padding(top = 8.dp)
@@ -577,13 +605,25 @@ fun HydrationTrackerWidget(
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                Text(
-                    text = "HYDRATION MILESTONE",
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = SoftMutedGray,
-                    letterSpacing = 0.5.sp
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.padding(bottom = 4.dp)
+                ) {
+                    Animated3DIconBox(
+                        imageRes = R.drawable.glass_water_3d_1783069419200,
+                        contentDescription = "3D Glass Water",
+                        backgroundColor = SkyBlueLight,
+                        sizeDp = 32
+                    )
+                    Text(
+                        text = "HYDRATION",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = SoftMutedGray,
+                        letterSpacing = 0.5.sp
+                    )
+                }
                 Text(
                     text = "$loggedMl / $targetMl ml",
                     fontSize = 18.sp,
@@ -652,42 +692,57 @@ fun DietAndMealGuide(calc: HealthCalculations) {
             Column(
                 modifier = Modifier.padding(16.dp)
             ) {
-                Text(
-                    text = "Daily Macronutrients Budget",
-                    fontWeight = FontWeight.Bold,
-                    color = DarkCharcoal,
-                    fontSize = 14.sp
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = "Daily Macronutrients Budget",
+                            fontWeight = FontWeight.Bold,
+                            color = DarkCharcoal,
+                            fontSize = 14.sp
+                        )
+                        Text(
+                            text = calc.goalDescription,
+                            fontSize = 11.sp,
+                            color = MintGreen,
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.padding(top = 2.dp)
+                        )
+                    }
+                }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(14.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    // Carbs (45%)
+                    // Carbs
                     MacroProgressItem(
                         title = "Carbs",
                         grams = calc.macroCarbsGrams,
-                        percent = 45,
+                        percent = calc.macroCarbsPercent,
                         color = SkyBlue,
                         modifier = Modifier.weight(1f)
                     )
 
-                    // Protein (30%)
+                    // Protein
                     MacroProgressItem(
                         title = "Protein",
                         grams = calc.macroProteinGrams,
-                        percent = 30,
+                        percent = calc.macroProteinPercent,
                         color = MintGreen,
                         modifier = Modifier.weight(1f)
                     )
 
-                    // Fat (25%)
+                    // Fat
                     MacroProgressItem(
                         title = "Fat",
                         grams = calc.macroFatGrams,
-                        percent = 25,
+                        percent = calc.macroFatPercent,
                         color = SoftCoral,
                         modifier = Modifier.weight(1f)
                     )
@@ -749,24 +804,23 @@ fun DietAndMealGuide(calc: HealthCalculations) {
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.Top
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(44.dp)
-                            .background(Color.White, RoundedCornerShape(12.dp)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = icon,
-                            contentDescription = mealName,
-                            tint = when (mealName) {
-                                "Breakfast" -> Color(0xFFF39C12)
-                                "Lunch" -> MintGreen
-                                "Dinner" -> SkyBlue
-                                else -> SoftCoral
-                            },
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
+                    Animated3DIconBox(
+                        imageVector = icon,
+                        contentDescription = mealName,
+                        backgroundColor = when (mealName) {
+                            "Breakfast" -> Color(0xFFFEF9E7)
+                            "Lunch" -> MintGreenLight
+                            "Dinner" -> SkyBlueLight
+                            else -> SoftCoralLight
+                        },
+                        iconColor = when (mealName) {
+                            "Breakfast" -> Color(0xFFF39C12)
+                            "Lunch" -> MintGreen
+                            "Dinner" -> SkyBlue
+                            else -> SoftCoral
+                        },
+                        sizeDp = 44
+                    )
 
                     Column(
                         modifier = Modifier.weight(1f)
@@ -833,5 +887,101 @@ fun MacroProgressItem(
         Spacer(modifier = Modifier.height(4.dp))
 
         Text("$percent%", fontSize = 9.sp, color = SoftMutedGray)
+    }
+}
+
+@Composable
+fun Animated3DIconBox(
+    @DrawableRes imageRes: Int? = null,
+    imageVector: ImageVector? = null,
+    contentDescription: String,
+    backgroundColor: Color,
+    iconColor: Color = Color.White,
+    modifier: Modifier = Modifier,
+    sizeDp: Int = 48
+) {
+    // Endlessly floating soft 3D animation
+    val infiniteTransition = rememberInfiniteTransition(label = "floating_3d")
+    val translationY by infiniteTransition.animateFloat(
+        initialValue = -4f,
+        targetValue = 4f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2200, easing = EaseInOutQuad),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "translation_y"
+    )
+    val rotationZ by infiniteTransition.animateFloat(
+        initialValue = -2f,
+        targetValue = 2f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2800, easing = EaseInOutQuad),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "rotation_z"
+    )
+
+    // Interactive soft click scale
+    var isPressed by remember { mutableStateOf(false) }
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.88f else 1.0f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioHighBouncy, stiffness = Spring.StiffnessMedium),
+        label = "press_scale"
+    )
+
+    Box(
+        modifier = modifier
+            .graphicsLayer {
+                this.translationY = translationY.dp.toPx()
+                this.rotationZ = rotationZ
+                this.scaleX = scale
+                this.scaleY = scale
+            }
+            .size(sizeDp.dp)
+            .shadow(
+                elevation = 8.dp,
+                shape = RoundedCornerShape(18.dp),
+                ambientColor = backgroundColor.copy(alpha = 0.3f),
+                spotColor = backgroundColor.copy(alpha = 0.5f)
+            )
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        backgroundColor,
+                        backgroundColor.copy(alpha = 0.85f)
+                    )
+                ),
+                shape = RoundedCornerShape(18.dp)
+            )
+            .clickable {
+                isPressed = true
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        LaunchedEffect(isPressed) {
+            if (isPressed) {
+                kotlinx.coroutines.delay(120)
+                isPressed = false
+            }
+        }
+
+        if (imageRes != null) {
+            androidx.compose.foundation.Image(
+                painter = painterResource(id = imageRes),
+                contentDescription = contentDescription,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(4.dp)
+                    .clip(RoundedCornerShape(14.dp)),
+                contentScale = ContentScale.Crop
+            )
+        } else if (imageVector != null) {
+            Icon(
+                imageVector = imageVector,
+                contentDescription = contentDescription,
+                tint = iconColor,
+                modifier = Modifier.size((sizeDp * 0.52).dp)
+            )
+        }
     }
 }

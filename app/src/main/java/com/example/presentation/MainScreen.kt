@@ -1,5 +1,7 @@
 package com.example.presentation
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -12,6 +14,7 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.testTag
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -79,12 +82,24 @@ fun MainScreen(viewModel: HealthViewModel) {
 
                     items.forEach { (screen, selectedIcon, unselectedIcon) ->
                         val isSelected = currentRoute == screen.route
+                        
+                        // Animated spring scale for 3D interactive click feedback
+                        val iconScale by animateFloatAsState(
+                            targetValue = if (isSelected) 1.25f else 1.00f,
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioHighBouncy,
+                                stiffness = Spring.StiffnessMedium
+                            ),
+                            label = "nav_item_scale"
+                        )
+
                         NavigationBarItem(
                             modifier = Modifier.testTag("nav_item_${screen.route}"),
                             icon = {
                                 Icon(
                                     imageVector = if (isSelected) selectedIcon else unselectedIcon,
-                                    contentDescription = screen.title
+                                    contentDescription = screen.title,
+                                    modifier = Modifier.scale(iconScale)
                                 )
                             },
                             label = { Text(screen.title) },
@@ -113,10 +128,62 @@ fun MainScreen(viewModel: HealthViewModel) {
             }
         }
     ) { innerPadding ->
+        fun getRouteIndex(route: String?): Int {
+            return when (route) {
+                Screen.Onboarding.route -> -1
+                Screen.Dashboard.route -> 0
+                Screen.History.route -> 1
+                Screen.Profile.route -> 2
+                else -> 0
+            }
+        }
+
         NavHost(
             navController = navController,
             startDestination = Screen.Dashboard.route,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding),
+            enterTransition = {
+                val initialIndex = getRouteIndex(initialState.destination.route)
+                val targetIndex = getRouteIndex(targetState.destination.route)
+                if (targetIndex > initialIndex) {
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessMedium)
+                    ) + fadeIn(animationSpec = tween(300))
+                } else {
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessMedium)
+                    ) + fadeIn(animationSpec = tween(300))
+                }
+            },
+            exitTransition = {
+                val initialIndex = getRouteIndex(initialState.destination.route)
+                val targetIndex = getRouteIndex(targetState.destination.route)
+                if (targetIndex > initialIndex) {
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessMedium)
+                    ) + fadeOut(animationSpec = tween(300))
+                } else {
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessMedium)
+                    ) + fadeOut(animationSpec = tween(300))
+                }
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessMedium)
+                ) + fadeIn(animationSpec = tween(300))
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessMedium)
+                ) + fadeOut(animationSpec = tween(300))
+            }
         ) {
             composable(Screen.Onboarding.route) {
                 OnboardingScreen(viewModel = viewModel)

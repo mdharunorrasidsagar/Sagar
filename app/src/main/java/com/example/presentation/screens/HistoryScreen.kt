@@ -1,8 +1,7 @@
 package com.example.presentation.screens
 
 import androidx.compose.animation.*
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,6 +14,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.ShowChart
+import androidx.compose.material.icons.filled.Timeline
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -66,20 +67,30 @@ fun HistoryScreen(viewModel: HealthViewModel) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
-                    Text(
-                        text = "ANALYTICS & HISTORY",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = SoftMutedGray,
-                        letterSpacing = 1.sp
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    FloatingEmblem(
+                        imageVector = Icons.Default.Timeline,
+                        color = MintGreen,
+                        backgroundColor = MintGreenLight
                     )
-                    Text(
-                        text = "Health Trends",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = DarkCharcoal
-                    )
+                    Column {
+                        Text(
+                            text = "ANALYTICS & HISTORY",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = SoftMutedGray,
+                            letterSpacing = 1.sp
+                        )
+                        Text(
+                            text = "Health Trends",
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = DarkCharcoal
+                        )
+                    }
                 }
 
                 Button(
@@ -458,5 +469,45 @@ fun TrendLineChart(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun FloatingEmblem(
+    imageVector: androidx.compose.ui.graphics.vector.ImageVector,
+    color: Color,
+    backgroundColor: Color,
+    modifier: Modifier = Modifier
+) {
+    val infiniteTransition = rememberInfiniteTransition(label = "floating_emblem")
+    val translationY by infiniteTransition.animateFloat(
+        initialValue = -3f,
+        targetValue = 3f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2000, easing = EaseInOutQuad),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "translation_y"
+    )
+
+    Box(
+        modifier = modifier
+            .graphicsLayer { this.translationY = translationY.dp.toPx() }
+            .size(44.dp)
+            .shadow(
+                elevation = 6.dp,
+                shape = RoundedCornerShape(14.dp),
+                ambientColor = color.copy(alpha = 0.2f),
+                spotColor = color.copy(alpha = 0.4f)
+            )
+            .background(backgroundColor, RoundedCornerShape(14.dp)),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = imageVector,
+            contentDescription = null,
+            tint = color,
+            modifier = Modifier.size(22.dp)
+        )
     }
 }

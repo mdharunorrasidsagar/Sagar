@@ -12,9 +12,13 @@ data class HealthCalculations(
     val tdee: Int,                // Total Daily Energy Expenditure (Active Metabolic Rate)
     val targetCalories: Int,      // Adjusted for target goal
     val dailyWaterTargetMl: Int,  // Hydration target in ml
-    val macroCarbsGrams: Int,     // 45% of target calories
-    val macroProteinGrams: Int,   // 30% of target calories
-    val macroFatGrams: Int        // 25% of target calories
+    val macroCarbsGrams: Int,     
+    val macroProteinGrams: Int,   
+    val macroFatGrams: Int,       
+    val macroCarbsPercent: Int,
+    val macroProteinPercent: Int,
+    val macroFatPercent: Int,
+    val goalDescription: String
 )
 
 object HealthEngine {
@@ -62,10 +66,34 @@ object HealthEngine {
         // Daily water target is standard 35ml per kg, or safe baseline 2500ml
         val dailyWaterTargetMl = (profile.weightKg * 35).roundToInt().coerceIn(1500, 4000)
 
-        // Macros breakdown: Carbs 45%, Protein 30%, Fat 25%
-        val carbsCalories = targetCalories * 0.45f
-        val proteinCalories = targetCalories * 0.30f
-        val fatCalories = targetCalories * 0.25f
+        // Scientific macronutrients split based on dynamic goal types:
+        // - "Lose": High protein, moderate fat, lower carbs to retain lean mass & promote satiety (35% C / 35% P / 30% F)
+        // - "Gain": Higher carbs to replenish glycogen stores & fuel intense workouts (50% C / 30% P / 20% F)
+        // - "Maintain": Standard balanced healthy split (45% C / 25% P / 30% F)
+        val carbsPct = when (profile.goalType) {
+            "Lose" -> 35
+            "Gain" -> 50
+            else -> 45
+        }
+        val proteinPct = when (profile.goalType) {
+            "Lose" -> 35
+            "Gain" -> 30
+            else -> 25
+        }
+        val fatPct = when (profile.goalType) {
+            "Lose" -> 30
+            "Gain" -> 20
+            else -> 30
+        }
+        val goalDesc = when (profile.goalType) {
+            "Lose" -> "Fat Loss & Lean Muscle Retention Split"
+            "Gain" -> "Clean Bulking & Hypertrophy Split"
+            else -> "Balanced Daily Weight Maintenance Split"
+        }
+
+        val carbsCalories = targetCalories * (carbsPct / 100f)
+        val proteinCalories = targetCalories * (proteinPct / 100f)
+        val fatCalories = targetCalories * (fatPct / 100f)
 
         val carbsGrams = (carbsCalories / 4f).roundToInt()
         val proteinGrams = (proteinCalories / 4f).roundToInt()
@@ -82,7 +110,11 @@ object HealthEngine {
             dailyWaterTargetMl = dailyWaterTargetMl,
             macroCarbsGrams = carbsGrams,
             macroProteinGrams = proteinGrams,
-            macroFatGrams = fatGrams
+            macroFatGrams = fatGrams,
+            macroCarbsPercent = carbsPct,
+            macroProteinPercent = proteinPct,
+            macroFatPercent = fatPct,
+            goalDescription = goalDesc
         )
     }
 }
